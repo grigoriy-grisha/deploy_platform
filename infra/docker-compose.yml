@@ -4,10 +4,24 @@ services:
   db:
     restart: always
     image: postgres:latest
+    networks:
+      new:
+        aliases:
+          - database
     volumes:
       - ./.database/postgres/data:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=qwerty
     ports:
-      - "5436:5432"
-
+      - "5432:5432"
+  migrate:
+    image: migrate/migrate
+    networks:
+      - new
+    volumes:
+      - ./migrations:/migrations
+    command: [ "-path=./migrations", "-database",  "postgres://postgres:qwerty@database:5432/postgres?sslmode=disable", "up" ]
+    links:
+      - db
+networks:
+  new:
