@@ -3,3 +3,7 @@ CREATE TABLE project (
   name varchar(255) not null,
   command varchar(255) not null
 );
+
+---- create above / drop below ----
+
+DROP TABLE project;

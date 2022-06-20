@@ -1,60 +1,33 @@
 package main
 
 import (
-	"bytes"
-	_ "github.com/lib/pq"
+	"cdcd_platform/internal/config"
+	"cdcd_platform/pkg/client"
+	"context"
 	"github.com/spf13/viper"
-	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/knownhosts"
+	"log"
 )
 
 func main() {
-	// ssh config
-	hostKeyCallback, err := knownhosts.New("C:\\Users\\programmer\\.ssh\\known_hosts")
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	config := &ssh.ClientConfig{
-		User: "sshuser",
-		Auth: []ssh.AuthMethod{
-			ssh.Password("123"),
-		},
-		HostKeyCallback: hostKeyCallback,
+	if err := config.InitConfig(); err != nil {
+		log.Fatal(err.Error())
 	}
-	// connect ot ssh server
-	client, err := ssh.Dial("tcp", "localhost:2022", config)
+
+	pool, err := client.NewClient(context.Background(), client.StorageConfig{
+		Dbname:   viper.GetString("db.dbname"),
+		Host:     viper.GetString("db.host"),
+		Password: viper.GetString("db.password"),
+		Port:     viper.GetString("db.port"),
+		SSLMode:  viper.GetString("db.sslmode"),
+		Username: viper.GetString("db.username"),
+	})
+
+	conn, err := pool.Acquire(context.Background())
+
 	if err != nil {
-		panic("Failed to dial: " + err.Error())
+		log.Fatalf("Unable to acquire a database connection: %v\n", err)
 	}
 
-	// Each ClientConn can support multiple interactive sessions,
-	// represented by a Session.
-	session, err := client.NewSession()
-	if err != nil {
-		panic("Failed to create session: " + err.Error())
-	}
-	defer session.Close()
-
-	// Once a Session is created, you can execute a single command on
-	// the remote side using the Run method.
-	var b bytes.Buffer
-	session.Stdout = &b
-
-	if err := session.Run("ls -la"); err != nil {
-		panic("Failed to run: " + err.Error())
-	}
-
-	if err := session.Wait(); err != nil {
-		panic(err.Error())
-	}
-
-	session.
-		fmt.Println(b.String())
-
-}
-
-func initConfig() error {
-	viper.AddConfigPath("internal/config")
-	viper.SetConfigName("config")
-	return viper.ReadInConfig()
+	conn.QueryRow(context.Background(), "INSERT INTO project (name, command) VALUES ($1, $2) RETURNING id", "hello", "hello")
+	conn.Conn()
 }
