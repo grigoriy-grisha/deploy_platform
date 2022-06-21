@@ -17,9 +17,13 @@ func NewProjectHandler(projectService service.Project) *projectHandler {
 }
 
 func (ph projectHandler) Register(router *gin.Engine) {
-	router.POST("/project/", ph.Create)
-	router.GET("/project/:id", ph.GetProject)
-	router.GET("/project/", ph.GetAllProjects)
+	group := router.Group("project")
+	{
+		group.POST("/", ph.Create)
+		group.GET("/", ph.GetAllProjects)
+		group.GET("/:id", ph.GetProject)
+	}
+
 }
 
 func (ph *projectHandler) Create(c *gin.Context) {
