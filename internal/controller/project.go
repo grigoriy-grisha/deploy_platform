@@ -19,6 +19,7 @@ func NewProjectHandler(projectService service.Project) *projectHandler {
 func (ph projectHandler) Register(router *gin.Engine) {
 	router.POST("/project/", ph.Create)
 	router.GET("/project/:id", ph.GetProject)
+	router.GET("/project/", ph.GetAllProjects)
 }
 
 func (ph *projectHandler) Create(c *gin.Context) {
@@ -54,4 +55,14 @@ func (ph *projectHandler) GetProject(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, project)
+}
+
+func (ph *projectHandler) GetAllProjects(c *gin.Context) {
+	projects, err := ph.projectService.GetAllProjects(c)
+
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	c.JSON(http.StatusOK, projects)
 }

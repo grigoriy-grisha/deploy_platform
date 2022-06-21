@@ -9,6 +9,7 @@ import (
 type ProjectRepo interface {
 	Create(ctx context.Context, project entity.Project) (int, error)
 	GetByID(ctx context.Context, id int) (*entity.Project, error)
+	GetAll(ctx context.Context) ([]*entity.Project, error)
 }
 
 type Repository struct {

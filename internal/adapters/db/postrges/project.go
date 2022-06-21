@@ -55,3 +55,18 @@ func (ps *ProjectStorage) GetByID(ctx context.Context, id int) (*entity.Project,
 func SqlGetById() string {
 	return fmt.Sprintf("SELECT id, name, command FROM %s WHERE id=$1", projectTable)
 }
+
+func (ps *ProjectStorage) GetAll(ctx context.Context) ([]*entity.Project, error) {
+	var projects []*entity.Project
+	err := pgxscan.Select(ctx, ps.pgx, &projects, SqlGetByAll())
+
+	if err != nil {
+		return nil, err
+	}
+
+	return projects, nil
+}
+
+func SqlGetByAll() string {
+	return fmt.Sprintf("SELECT id, name, command FROM %s", projectTable)
+}
