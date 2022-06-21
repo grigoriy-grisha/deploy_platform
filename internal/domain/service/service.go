@@ -8,6 +8,7 @@ import (
 
 type Project interface {
 	CreateProject(ctx context.Context, project entity.Project) (int, error)
+	GetProject(ctx context.Context, id int) (*entity.Project, error)
 }
 
 type Service struct {

@@ -4,6 +4,7 @@ import (
 	"cdcd_platform/internal/domain/entity"
 	"context"
 	"fmt"
+	"github.com/georgysavva/scany/pgxscan"
 	"github.com/jackc/pgx/v4/pgxpool"
 )
 
@@ -23,16 +24,34 @@ func (ps *ProjectStorage) Create(ctx context.Context, project entity.Project) (i
 	}
 
 	var id int
-	row := tx.QueryRow(ctx, getCreateSql(), project.Name, project.Command)
+	row := tx.QueryRow(ctx, SqlCreate(), project.Name, project.Command)
 
 	if err := row.Scan(&id); err != nil {
-		tx.Rollback(ctx)
+		if err := tx.Rollback(ctx); err != nil {
+			return 0, err
+		}
+
 		return 0, err
 	}
 
 	return id, tx.Commit(ctx)
 }
 
-func getCreateSql() string {
+func SqlCreate() string {
 	return fmt.Sprintf("INSERT INTO %s (name, command) VALUES ($1, $2) RETURNING id", projectTable)
+}
+
+func (ps *ProjectStorage) GetByID(ctx context.Context, id int) (*entity.Project, error) {
+	var project []*entity.Project
+	err := pgxscan.Select(ctx, ps.pgx, &project, SqlGetById(), id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return project[0], nil
+}
+
+func SqlGetById() string {
+	return fmt.Sprintf("SELECT id, name, command FROM %s WHERE id=$1", projectTable)
 }

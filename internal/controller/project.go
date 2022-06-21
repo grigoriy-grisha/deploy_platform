@@ -5,6 +5,7 @@ import (
 	"cdcd_platform/internal/domain/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 type projectHandler struct {
@@ -17,9 +18,10 @@ func NewProjectHandler(projectService service.Project) *projectHandler {
 
 func (ph projectHandler) Register(router *gin.Engine) {
 	router.POST("/project/", ph.Create)
+	router.GET("/project/:id", ph.GetProject)
 }
 
-func (ph projectHandler) Create(c *gin.Context) {
+func (ph *projectHandler) Create(c *gin.Context) {
 	var input entity.Project
 	if err := c.BindJSON(&input); err != nil {
 		newErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -36,4 +38,20 @@ func (ph projectHandler) Create(c *gin.Context) {
 	c.JSON(http.StatusCreated, map[string]interface{}{
 		"id": id,
 	})
+}
+
+func (ph *projectHandler) GetProject(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+
+	if err != nil {
+		newErrorResponse(c, http.StatusBadRequest, "invalid id param")
+	}
+
+	project, err := ph.projectService.GetProject(c, id)
+
+	if err != nil {
+		newErrorResponse(c, http.StatusInternalServerError, err.Error())
+	}
+
+	c.JSON(http.StatusOK, project)
 }

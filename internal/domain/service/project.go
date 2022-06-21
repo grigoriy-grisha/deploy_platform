@@ -14,6 +14,10 @@ func NewProjectService(repo repositories.ProjectRepo) *ProjectService {
 	return &ProjectService{projectRepository: repo}
 }
 
-func (ps ProjectService) CreateProject(ctx context.Context, project entity.Project) (int, error) {
+func (ps *ProjectService) CreateProject(ctx context.Context, project entity.Project) (int, error) {
 	return ps.projectRepository.Create(ctx, project)
+}
+
+func (ps *ProjectService) GetProject(ctx context.Context, id int) (*entity.Project, error) {
+	return ps.projectRepository.GetByID(ctx, id)
 }

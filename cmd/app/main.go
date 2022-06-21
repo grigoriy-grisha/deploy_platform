@@ -9,7 +9,6 @@ import (
 	"cdcd_platform/pkg/server"
 	"context"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"log"
 	"os"
@@ -42,7 +41,7 @@ func main() {
 	<-quit
 
 	if err := srv.Shutdown(context.Background()); err != nil {
-		logrus.Errorf("error occured on server shutting down: %s", err.Error())
+		log.Fatalf("error occured on server shutting down: %s", err.Error())
 	}
 
 }

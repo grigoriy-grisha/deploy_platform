@@ -3,10 +3,14 @@ module cdcd_platform
 go 1.16
 
 require (
+	github.com/georgysavva/scany v1.0.0
 	github.com/gin-gonic/gin v1.8.1
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
-	github.com/golang-migrate/migrate/v4 v4.15.2
+	github.com/gofrs/uuid v4.0.0+incompatible // indirect
+	github.com/google/uuid v1.3.0 // indirect
+	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/jackc/pgconn v1.8.0
+	github.com/jackc/pgproto3/v2 v2.0.7 // indirect
 	github.com/jackc/pgx/v4 v4.10.1
 	github.com/jackc/tern v1.13.0
 	github.com/lib/pq v1.10.6 // indirect
