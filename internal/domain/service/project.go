@@ -21,3 +21,7 @@ func (ps *ProjectService) CreateProject(ctx context.Context, project entity.Proj
 func (ps *ProjectService) GetProject(ctx context.Context, id int) (*entity.Project, error) {
 	return ps.projectRepository.GetByID(ctx, id)
 }
+
+func (ps *ProjectService) GetAllProjects(ctx context.Context) ([]*entity.Project, error) {
+	return ps.projectRepository.GetAll(ctx)
+}
